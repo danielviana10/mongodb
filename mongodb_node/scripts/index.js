@@ -7,12 +7,15 @@ async function run() {
 
     const usersCollection = db.collection("accounts");
 
-    const documentsToFind = { _id: new ObjectId("69e30c604c3f45c75701d2c7") };
+    const documentToUpdate = { account_type: 'checking' }
+
+    const update = { $push: { transfers_complete: "09876" } }
 
     try {
-        const result = await usersCollection.findOne(documentsToFind);
-        console.log("Um documento encontrado:");
-        console.log(result);
+        const result = await usersCollection.updateMany(documentToUpdate, update)
+        result.modifiedCount > 0
+            ? console.log(`Updated ${result.modifiedCount} documents`)
+            : console.log('No documents updated')
     } catch (error) {
         console.error("Erro ao inserir conta:", error);
     } finally {
