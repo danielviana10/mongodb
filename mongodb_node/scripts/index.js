@@ -1,26 +1,29 @@
-import { ObjectId } from "mongodb";
-import { client, connect } from "../db/conn.js";
+require("dotenv").config({ path: "/lab/.env" });
+const { MongoClient } = require("mongodb");
 
-
-async function run() {
-    const db = await connect();
-
-    const usersCollection = db.collection("accounts");
-
-    const documentsToDelete = { account_type: 'checking' }
-    try {
-        const result = await usersCollection.deleteMany(documentsToDelete)
-        result.deletedCount > 0
-            ? console.log(`Deleted ${result.deletedCount} documents`)
-            : console.log("No documents deleted");
-    } catch (error) {
-        console.error("Erro ao inserir conta:", error);
-    } finally {
-        await client.close();
-        console.log("Conexão com MongoDB fechada");
-    }
-
-
+if (!process.env.MONGODB_URI) {
+    throw new Error("Missing MONGODB_URI in .env");
 }
 
-run();
+const client = new MongoClient(process.env.MONGODB_URI);
+const documentsToDelete = { balance: { $lt: 500 } }
+
+async function main() {
+    try {
+        await client.connect();
+        const db = client.db("bank");
+        const accountsCollection = db.collection("accounts");
+
+        // TODO: Assign the result of the deleteMany operation to a variable called `result`
+        const result = await accountsCollection.deleteMany(documentsToDelete)
+
+        console.log(`Deleted documents: ${result.deletedCount}`);
+    } catch (error) {
+        console.error(`Error deleting documents: ${error}`);
+        throw error;
+    } finally {
+        await client.close();
+    }
+}
+
+main().catch((error) => console.error(error));
