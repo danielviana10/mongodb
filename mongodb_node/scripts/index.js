@@ -7,12 +7,11 @@ async function run() {
 
     const usersCollection = db.collection("accounts");
 
-    const documentToDelete = { _id: new ObjectId("69e30c604c3f45c75701d2c7") }
-
+    const documentsToDelete = { account_type: 'checking' }
     try {
-        const result = await usersCollection.deleteOne(documentToUpdate)
-        result.deletedCount === 1
-            ? console.log("Deleted one document")
+        const result = await usersCollection.deleteMany(documentsToDelete)
+        result.deletedCount > 0
+            ? console.log(`Deleted ${result.deletedCount} documents`)
             : console.log("No documents deleted");
     } catch (error) {
         console.error("Erro ao inserir conta:", error);
