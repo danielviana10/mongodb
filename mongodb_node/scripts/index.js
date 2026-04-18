@@ -1,3 +1,4 @@
+import { ObjectId } from "mongodb";
 import { client, connect } from "../db/conn.js";
 
 
@@ -6,14 +7,12 @@ async function run() {
 
     const usersCollection = db.collection("accounts");
 
-    const documentsToFind = { balance: { $gt: 3000 } };
+    const documentsToFind = { _id: new ObjectId("69e30c604c3f45c75701d2c7") };
 
     try {
-
-        const result = usersCollection.find(documentsToFind)
-        const docCount = usersCollection.countDocuments(documentsToFind);
-        await result.forEach(doc => console.log(doc));
-        console.log('Total de documentos encontrados:', await docCount);
+        const result = await usersCollection.findOne(documentsToFind);
+        console.log("Um documento encontrado:");
+        console.log(result);
     } catch (error) {
         console.error("Erro ao inserir conta:", error);
     } finally {
