@@ -6,15 +6,23 @@ if (!process.env.MONGODB_URI) {
 }
 
 const client = new MongoClient(process.env.MONGODB_URI);
+
 const pipeline = [
-    // TODO: match accounts with a balance lesser than 1000
-    { $match: { balance: { $lt: 1000 } } },
+    // TODO: match accounts with a balance greater than 1000
+    { $match: { balance: { $gt: 1000 } } },
     {
-        $group: {
-            // TODO: Calculate average balance and total balance for each type of account
-            _id: "$account_type",
-            total_balance: { $sum: "$balance" },
-            avg_balance: { $avg: "$balance" },
+        $sort: {
+            // TODO: sort accounts by balance in descending order
+            balance: -1
+        },
+    },
+    {
+        $project: {
+            // TODO: include the account_id, account_type, balance, and a new field called gdp_balance (divide the balance field by 1.3)
+            account_id: 1,
+            account_type: 1,
+            balance: 1,
+            gdp_balance: { $divide: ["$balance", 1.3] },
         },
     },
 ];
@@ -36,4 +44,4 @@ async function main() {
     }
 }
 
-main().catch((error) => console.error(error));
+main().catch((error) => console.error(error));  
